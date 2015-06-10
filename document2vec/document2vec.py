@@ -2,7 +2,6 @@ import gensim
 import math
 import copy
 import numpy as np
-from scipy.spatial.distance import cosine
 from gensim.models import Doc2Vec, Word2Vec
 
 
@@ -53,13 +52,6 @@ class Document2Vec(Doc2Vec):
         """Return the vector for a word"""
         return self.syn0[self.vocab[word].index]
 
-    def word_similarity(self, word1, word2):
-        """Measure word-to-word cosine similarity"""
-        v1 = self.get_vector(self, word1)
-        v2 = self.get_vector(self, word2)
-        sim = cosine(v1, v2)
-        return sim
-
     def _build_checkpoint(self):
         """Save the current state of the vectors such that
            we can revert training progress."""
@@ -89,19 +81,14 @@ class Document2Vec(Doc2Vec):
         """
         if prefix is None:
             prefix = 'SENT'
-        # One label for each sentence
-        labels, num_lines = [], 0
-        for j, sentence in enumerate(corpus):
-            num_lines += 1
-            label = Document2Vec._make_label(prefix, str(j))
-            labels.append(label)
+        num_lines = sum(1 for _ in corpus)
         # Expand syn0
         shape = (self.syn0.shape[0] + num_lines, self.syn0.shape[1])
         syn0 = (np.random.random(shape).astype(self.syn0.dtype) - 0.5)
         syn0 /= self.layer1_size
         syn0[:self.syn0.shape[0]] = self.syn0
         self.syn0 = syn0
-        self.index2word_start = len(self.index2word)
+        index2word_start = len(self.index2word)
         for j, line_no in enumerate(range(num_lines)):
             # Expand vocab
             newvocab = gensim.models.doc2vec.Vocab()
@@ -115,10 +102,7 @@ class Document2Vec(Doc2Vec):
             # Expand index2word
             self.index2word.append(label)
             assert len(self.index2word) == newvocab.index + 1
-
-    def _vocab_proba(self):
-        for label, vocab in self.vocab.items():
-            vocab.sample_probability = 1.0
+        return index2word_start
 
     @staticmethod
     def _calc_alpha(num_iters, i, initial=0.025):
@@ -130,8 +114,7 @@ class Document2Vec(Doc2Vec):
         """
         self.train_word = False
         self.train_lbls = True
-        # self._vocab_proba()
-        # self.build_vocab(corpus)
+        self.index2word_start = self._expand_from(corpus)
         for i in range(0, num_iters):
             self.alpha = Document2Vec._calc_alpha(num_iters, i)
             self.min_alpha = self.alpha
@@ -145,8 +128,8 @@ class Document2Vec(Doc2Vec):
     def fit_transform(self, *args, **kwargs):
         return self._fit(*args, **kwargs)
 
-    def transform(self, *args, **kwargs):
+    def transform(self, corpus, **kwargs):
         self._build_checkpoint()
-        vectors = self.fit_transform(*args, **kwargs)
+        vectors = self.fit_transform(corpus, **kwargs)
         self._reset_to_checkpoint()
         return vectors
