@@ -8,7 +8,7 @@ Finding document vectors from pre-trained word2vec word vectors
 Simply install from the git repo like so:
 
 ```bash
-pip install -e git+git://github.com/cemoody/Document2Vec.git
+pip install -e git+git://github.com/cemoody/Document2Vec.git#egg=Package
 # on a shared machine without system-python access add --user
 ```
 
@@ -36,6 +36,7 @@ And then semantic similarities can be evaluated directly:
 from scipy.spatial.distance import cosine
 # vector for 'i love jackets'
 v0 = doc_vectors[0, :] 
+# vector for 'coat'
 v1 = d2v['coat']
 similarity = cosine(v0, v1)
 print(similarity) # 0.84
