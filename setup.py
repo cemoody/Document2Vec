@@ -7,6 +7,4 @@ setup(name='Document2Vec',
       description='Finding document vectors from pre-trained word vectors',
       author='Christopher Erick Moody',
       author_email='chrisemoody@gmail.com',
-      url='https://',
-      packages=['distutils', 'distutils.command'],
-     )
+      url='https://github.com/cemoody/Document2Vec')
