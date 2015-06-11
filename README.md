@@ -37,4 +37,10 @@ v1 = d2v['coat']
 similarity = cosine(v0, v1)
 print(similarity) # 0.84
 # Note that sentence vector and the coat vector are very similar
+# even though the sentence did not literally contain the word `coat`
+v2 = d2v['jacket']
+similarity = cosine(v0, v2)
+print(similarity) # 0.87
+# Of course, the similarity with a word that is included
+# is slightly higher
 ```
