@@ -44,3 +44,4 @@ print(similarity) # 0.87
 # Of course, the similarity with a word that is included
 # is slightly higher
 ```
+
