@@ -8,8 +8,7 @@ env:
 
 matrix:
     include:
-        # All the versions of Python.
-        - python: 2.6
+        # All the recent versions of Python.
         - python: 2.7
         - python: 3.3
         - python: 3.4

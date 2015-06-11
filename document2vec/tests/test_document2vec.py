@@ -33,6 +33,8 @@ class TestDoc2Vec(unittest.TestCase):
         m = Document2Vec()
         assert 'train_lbls' in dir(m)
 
+    @unittest.skipIf(not os.path.exists(w2v_file),
+                     "Need the file %s to continue" % w2v_file)
     def test_load_from_w2v(self):
         model = Document2Vec(w2v_file)
         self.assertIsNot(type(model), None)
