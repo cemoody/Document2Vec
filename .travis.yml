@@ -24,7 +24,8 @@ before_install:
 install:
     - conda create --yes -n testing python=$TRAVIS_PYTHON_VERSION
     - source activate testing
-    - conda install --yes numpy=$NUMPY_VERSION nose pip numba cython gensim pandas
+    - conda install --yes numpy=$NUMPY_VERSION nose pip numba cython pandas
+    - pip install gensim
 
 script:
     - ls

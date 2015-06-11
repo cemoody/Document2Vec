@@ -1,6 +1,9 @@
 # Document2Vec
 Finding document vectors from pre-trained word2vec word vectors
 
+![Build Status](https://api.travis-ci.org/cemoody/Document2Vec.svg)
+![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)
+
 # How to install
 Simply install from the git repo like so:
 
