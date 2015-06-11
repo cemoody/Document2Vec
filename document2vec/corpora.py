@@ -24,7 +24,6 @@ class SeriesCorpus(TextCorpus):
             for index, line in zip(self.series.index, self.series.values):
                 label = ['SENT_%s' % str(index)]
                 ls = LabeledSentence(line.split(' '), label)
-                print(label, line, ls)
                 yield ls
         else:
             for index, line in self.series.index, self.series.values:
@@ -40,7 +39,6 @@ class SeriesCorpus(TextCorpus):
                 yield word
 
     def get_texts(self):
-        # import pdb; pdb.set_trace()
         logging.info("Iterating SeriesCorpus")
         for lineno, line in enumerate(self.series.values):
             if self.metadata:
