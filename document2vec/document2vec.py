@@ -6,13 +6,19 @@ from gensim.models import Doc2Vec, Word2Vec
 
 
 class Document2Vec(Doc2Vec):
-    def __init__(self, filename=None, min_count=1):
+    def __init__(self, filename=None, min_count=1, alpha_initial=0.25,
+                 min_iters=5, monitor=None):
         Doc2Vec.__init__(self)
         if filename is not None:
             self.load_from_pickle(filename)
         self.checkpoint = {}
         self.filename = filename
         self.min_count = min_count
+        self.alpha_initial = alpha_initial
+        self.min_iters = min_iters
+        if monitor is None:
+            monitor = lambda *x: None
+        self.monitor = monitor
         assert 'train_lbls' in dir(self)
 
     def load_from_pickle(self, filename):
@@ -104,22 +110,25 @@ class Document2Vec(Doc2Vec):
             assert len(self.index2word) == newvocab.index + 1
         return index2word_start
 
-    @staticmethod
-    def _calc_alpha(num_iters, i, initial=0.025):
+    def _calc_alpha(self, i, num_iters, initial):
         return initial * (num_iters - i) / num_iters + 0.0001 * i / num_iters
 
-    def _fit(self, corpus, num_iters=20):
+    def _fit(self, corpus):
         """
         Given a gensim corpus, train the word2vec model on it.
         """
+        self.index2word_start = self._expand_from(corpus)
         self.train_word = False
         self.train_lbls = True
-        self.index2word_start = self._expand_from(corpus)
-        for i in range(0, num_iters):
-            self.alpha = Document2Vec._calc_alpha(num_iters, i)
+        start = self.index2word_start
+        self.alpha = 0.025
+        self.train(corpus)
+        for i in range(0, self.min_iters):
+            self.alpha = self._calc_alpha(i, self.min_iters,
+                                          self.alpha_initial)
             self.min_alpha = self.alpha
             self.train(corpus)
-        start = self.index2word_start
+            self.monitor(self)
         return self.syn0[start:]
 
     def fit(self, *args, **kwargs):
