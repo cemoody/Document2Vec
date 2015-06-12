@@ -37,17 +37,21 @@ And then semantic similarities can be evaluated directly:
 from scipy.spatial.distance import cosine
 # vector for 'i love jackets'
 v0 = doc_vectors[0, :] 
-# vector for 'coat'
-v1 = d2v['coat']
+# vector the word 'jackets'
+v1 = d2v['jackets']
 similarity = 1 - cosine(v0, v1)
-print(similarity) # 0.84
-# Note that sentence vector and the coat vector are very similar
-# even though the sentence did not literally contain the word `coat`
-v2 = d2v['jacket']
+print(similarity) # 0.320
+# Of course, the similarity with a word that is literally
+# in the sentence is going to be quite high
+# What if we try something similar, like coats?
+v2 = d2v['coats']
 similarity = 1 - cosine(v0, v2)
-print(similarity) # 0.87
-# Of course, the similarity with a word that is included
-# is slightly higher
+print(similarity) # 0.265
+# And then if we try a very something very dissimilar from the sentece
+# like the city of New York we get low similarity:
+v3 = d2v['new_york']
+similarity = 1 - cosine(v0, v3)
+print(similarity) # 0.02
 ```
 
 # Monitoring training
@@ -57,12 +61,23 @@ to make sure doc2vec is at (least locally) doing what it should be doing:
 
 ```python
 from scipy.spatial.distance import cosine
+import numpy as np
 def monitor(model):
-    print model.alpha
+    print model.alpha,
     for word in ['jackets', 'jacket', 'coats', 'dog']:
-        print 1.0 - cosine(model['SENT_0'], model[word]),
+        print word,': ', 1.0 - cosine(model['SENT_0'], model[word]),
     print " "
-model.monitor = monitor
+d2v.monitor = monitor
 doc_vectors = d2v.transform(corpus)
+```
+
+Will print something similar to the following:
+
+```
+0.25000 jackets :  0.347975713494 jacket :  0.150385576332 coats : 0.305263268479 dog :  0.121432161320
+0.20002 jackets :  0.301431248517 jacket :  0.113824911821 coats : 0.272647329817 dog :  0.125565730551
+0.15004 jackets :  0.296385793196 jacket :  0.108801409463 coats : 0.267922727947 dog :  0.126922837909
+0.10006 jackets :  0.293973052240 jacket :  0.106190931536 coats : 0.265730524733 dog :  0.126504370045
+0.05008 jackets :  0.293425048701 jacket :  0.105495592420 coats : 0.264931351959 dog :  0.125495564005
 ```
  
